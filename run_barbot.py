@@ -1,5 +1,6 @@
 import serial, pygame, sys, time, random, os, argparse, csv
 from pygame import locals
+from random import choice
 
 
 def main():
@@ -36,13 +37,13 @@ def main():
             if line == "countdown":
                 print "woo counting"
                 playSoundFromDir(args.starts)
-            
+
             elif line == "start":
                 song = playSoundFromDir(args.dances)
                 dance = captureDance(ddrmat, args.length, serDevice)
                 pygame.mixer.music.stop()
-                steps, combos, clusters = scoreDance(dance)
-                
+                steps, combos, clusters = analyzeDance(dance)
+
                 print "scored dance: steps={0}, combos={1}, clusters={2}".format(steps, combos, clusters)
                 drink = chooseDrink(args.length, steps, combos, clusters)
                 print "dance is '{0}' -> cocktail #{1}".format(drink, cocktail[drink])
@@ -67,8 +68,8 @@ def playSoundFromDir(dir):
         return files[index]
     except pygame.error:
         return playSoundFromDir(dir)
-    
-    
+
+
 def chooseDrink(time_dancing, steps, combos, clusters):
     if (steps * 60 / time_dancing) > 80: #fast threshold speed
         if clusters < 2:   #good rhythm
@@ -84,9 +85,9 @@ def chooseDrink(time_dancing, steps, combos, clusters):
             return "shy"
         else: #bad rhythm
             return "terrible"
-    
 
-def scoreDance(dance):
+
+def analyzeDance(dance):
     nbSteps = len(dance)
     nbCombos = 0
     timeDifferentials = []
